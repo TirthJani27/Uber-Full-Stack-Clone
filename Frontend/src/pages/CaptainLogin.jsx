@@ -1,15 +1,32 @@
-import React from "react";
+import React, { useContext } from "react";
 
 import { Input } from "@material-tailwind/react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { CaptainDataContext } from "../context/CaptainContext";
+import axios from "axios";
 
 const CaptainLogin = () => {
+  const navigate = useNavigate();
+  const { setCaptain } = useContext(CaptainDataContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
+    const response = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}captains/login`,
+      {
+        email,
+        password,
+      }
+    );
+    if (response.status == 200) {
+      const data = response.data;
+      localStorage.setItem("token", data.token);
+      setCaptain(data.captain);
+      navigate("/captain-home");
+    }
     setEmail("");
     setPassword("");
   };

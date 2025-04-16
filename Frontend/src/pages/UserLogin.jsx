@@ -7,25 +7,40 @@ import { UserDataContext } from "../context/UserContext";
 const UserLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const { setUserData } = useContext(UserDataContext);
-
   const navigate = useNavigate();
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
-    const response = await axios.post(
-      `${import.meta.env.VITE_BASE_URL}users/login`,
-      { email, password }
-    );
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}users/login`,
+        { email, password }
+      );
 
-    if (response.status == 200) {
-      const userData = response.data;
-      setUserData(userData.user);
-      localStorage.setItem("token", JSON.stringify(userData.token));
-      navigate("/home");
+      if (response.status === 200) {
+        const userData = response.data;
+        setUserData(userData.user);
+
+        // Store the token without quotes
+        localStorage.setItem("token", userData.token);
+
+        // Clear form
+        setEmail("");
+        setPassword("");
+
+        navigate("/home");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      setError(
+        err.response?.data?.message ||
+          "Login failed. Please check your credentials and try again."
+      );
     }
-    setPassword("");
   };
 
   return (
@@ -33,6 +48,11 @@ const UserLogin = () => {
       <form onSubmit={onSubmit}>
         <div>
           <img className="w-20 mb-10" src="logo.png" alt="uber logo" />
+
+          {error && (
+            <div className="mb-4 text-red-600 font-medium">{error}</div>
+          )}
+
           <div className="mb-6">
             <h3 className="mb-2 text-xl">What's your email</h3>
             <Input
@@ -40,11 +60,10 @@ const UserLogin = () => {
               value={email}
               type="email"
               required
-              onChange={(e) => {
-                setEmail(e.target.value);
-              }}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
+
           <div>
             <h3 className="mb-2 text-xl">Enter Password</h3>
             <Input
@@ -52,11 +71,10 @@ const UserLogin = () => {
               label="Password"
               type="password"
               value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-              }}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
+
           <div className="mt-5">
             <button
               type="submit"
@@ -65,6 +83,7 @@ const UserLogin = () => {
               Login
             </button>
           </div>
+
           <div className="mt-2 text-center">
             <span className="text-gray-700">New here? </span>
             <Link to={"/signup"}>

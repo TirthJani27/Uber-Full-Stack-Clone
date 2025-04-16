@@ -1,23 +1,58 @@
 import React, { useState, useContext } from "react";
-
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { Input } from "@material-tailwind/react";
 import { Link } from "react-router-dom";
-import { UserDataContext } from "../context/UserContext";
+import { CaptainDataContext } from "../context/CaptainContext";
 
 const CaptainSignup = () => {
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { userData, setUserData } = useContext(UserDataContext);
+  const [vehicleType, setVehicleType] = useState("");
+  const [vehiclePlate, setVehiclePlate] = useState("");
+  const [vehicleCapacity, setVehicleCapacity] = useState(0);
+  const [vehicleColor, setVehicleColor] = useState("");
+  const { setCaptain } = useContext(CaptainDataContext);
 
-  const onSubmitHandler = (e) => {
+  const navigate = useNavigate();
+
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
-    setUserData({ fullname: { firstname, lastname }, email });
+
+    const response = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}captains/register`,
+      {
+        fullname: {
+          firstname,
+          lastname,
+        },
+        email,
+        password,
+        vehicle: {
+          color: vehicleColor,
+          plate: vehiclePlate,
+          capacity: vehicleCapacity,
+          vehicleType: vehicleType,
+        },
+      }
+    );
+    if (response.status == 201 || response.status == 200) {
+      const token = response.data.token;
+      localStorage.setItem("token", token);
+      setCaptain(response.data.captain);
+      navigate("/captain-home");
+    }
+
     setFirstname("");
     setLastname("");
     setEmail("");
     setPassword("");
+    setVehicleType("");
+    setVehiclePlate("");
+    setVehicleCapacity(0);
+    setVehicleColor("");
   };
 
   return (
@@ -41,7 +76,7 @@ const CaptainSignup = () => {
               }}
             />
           </div>
-          <div className="mb-6 ">
+          <div className="mb-6">
             <Input
               label="Last Name"
               value={lastname}
@@ -80,12 +115,61 @@ const CaptainSignup = () => {
             />
           </div>
         </div>
+        <div className="mb-6">
+          <h3 className="mb-2 text-xl">Vehicle Information</h3>
+          <div className="flex-1">
+            <select
+              value={vehicleType}
+              required
+              onChange={(e) => setVehicleType(e.target.value)}
+              className="w-full px-3 py-2 mb-4 border rounded-lg"
+            >
+              <option value="" disabled>
+                Select Vehicle Type
+              </option>
+              <option value="car">Car</option>
+              <option value="auto">Auto</option>
+              <option value="motorcycle">Bike</option>
+            </select>
+          </div>
+          <div className="mb-3">
+            <Input
+              label="Vehicle Plate"
+              value={vehiclePlate}
+              required
+              onChange={(e) => {
+                setVehiclePlate(e.target.value);
+              }}
+            />
+          </div>
+          <div className="mb-3">
+            <Input
+              label="Vehicle Capacity"
+              value={vehicleCapacity}
+              required
+              type="number"
+              onChange={(e) => {
+                setVehicleCapacity(e.target.value);
+              }}
+            />
+          </div>
+          <div className="mb-6">
+            <Input
+              label="Vehicle Color"
+              value={vehicleColor}
+              required
+              onChange={(e) => {
+                setVehicleColor(e.target.value);
+              }}
+            />
+          </div>
+        </div>
         <div className="mt-5">
           <button
             type="submit"
             className="py-3 text-center font-semibold text-white bg-black rounded-lg w-full"
           >
-            Create Account
+            Create Captain Account
           </button>
         </div>
         <div className="mt-2 text-center">
