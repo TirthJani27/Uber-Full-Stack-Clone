@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import CaptinLogin from "./pages/CaptainLogin";
 import Start from "./pages/Start.jsx";
+import Riding from "./pages/Riding.jsx";
 import UserLogin from "./pages/UserLogin";
 import UserSignup from "./pages/UserSignup";
 import UserLogout from "./pages/UserLogout.jsx";
@@ -22,6 +23,7 @@ const App = () => {
         <Route path="/captain-login" element={<CaptinLogin />} />
         <Route path="/captain-signup" element={<CaptinSignup />} />
         <Route path="/signup" element={<UserSignup />} />
+        <Route path="/riding" element={<Riding />} />
         <Route
           path="/home"
           element={
@@ -47,7 +49,7 @@ const App = () => {
           }
         />
         <Route
-          path="/captain-home"
+          path="/captain-logout"
           element={
             <CaptainProtectWrapper>
               <CaptainLogout />

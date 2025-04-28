@@ -5,7 +5,7 @@ import { CaptainDataContext } from "../context/CaptainContext";
 
 const CaptainProtectWrapper = ({ children }) => {
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("captain-token");
   const { setCaptain } = useContext(CaptainDataContext);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -29,7 +29,7 @@ const CaptainProtectWrapper = ({ children }) => {
     })
     .catch((err) => {
       console.log(err);
-      localStorage.removeItem("token");
+      localStorage.removeItem("captain-token");
       navigate("/captain-login");
     });
 
