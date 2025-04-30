@@ -177,7 +177,7 @@ const Home = () => {
             />
           </form>
         </div>
-        <div className=" bg-white opacity-0 " ref={pannelRef}>
+        <div className="bg-white opacity-0" ref={pannelRef}>
           <LocationSearchPannel
             pannelOpen={pannelOpen}
             setPannelOpen={setPannelOpen}
