@@ -20,7 +20,10 @@ const RidePopup = (props) => {
             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMdBuvbsYu7WYAAUY2AqSQRGNESsYdkucDkQ&s"
             alt=""
           />
-          <h2 className="text-xl font-medium ">Harshita Rajput</h2>
+          <h2 className="text-xl font-medium ">
+            {props.ride.user.fullname.firstname}{" "}
+            {props.ride.user.fullname.lastname ?? " "}
+          </h2>
         </div>
         <h5 className="text-lg font-semibold">2.2 km</h5>
       </div>
@@ -30,25 +33,23 @@ const RidePopup = (props) => {
           <div className="flex items-center gap-5 p-2 border-b-2 ">
             <i className="ri-map-pin-user-fill"></i>
             <div className="">
-              <h3 className="text-lg font-medium">562/11-A</h3>
-              <p className="text-sm -mt-1 text-gray-600">
-                Kankariya Talab, Ahmedabad{" "}
-              </p>
+              <h3 className="text-lg font-medium">Pickup</h3>
+              <p className="text-sm -mt-1 text-gray-600">{props.ride.pickup}</p>
             </div>
           </div>
           <div className="flex items-center gap-5 p-2 border-b-2 ">
             <i className=" text-lg ri-map-pin-2-fill"></i>
             <div className="">
-              <h3 className="text-lg font-medium">562/11-A</h3>
+              <h3 className="text-lg font-medium">Destination</h3>
               <p className="text-sm -mt-1 text-gray-600">
-                Kankariya Talab, Ahmedabad{" "}
+                {props.ride.destination}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-5 p-2 ">
             <i className=" text-lg ri-currency-line"></i>
             <div className="">
-              <h3 className="text-lg font-medium">₹193.20</h3>
+              <h3 className="text-lg font-medium">₹{props.ride.fare}</h3>
               <p className="text-sm -mt-1 text-gray-600">Cash Cash</p>
             </div>
           </div>

@@ -53,6 +53,7 @@ module.exports.loginUser = async (req, res, next) => {
     return res.status(401).json({ error: "Invalid email or password" });
   }
   const token = user.generateAuthToken();
+
   req.cookies.token = token;
   res.status(200).json({ token, user });
 };

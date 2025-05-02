@@ -18,7 +18,7 @@ module.exports.authUser = async (req, res, next) => {
   const isBlackListed = await blacklistTokenModel.findOne({ token });
   if (isBlackListed) {
     console.log("Blacklisted Token:", isBlackListed);
-    return res.status(401).json({ message: "Unauthorized" });
+    return res.status(401).json({ message: "Unauthorized as Blacklisted" });
   }
 
   try {
@@ -26,14 +26,14 @@ module.exports.authUser = async (req, res, next) => {
     const user = await userModel.findById(decoded._id);
 
     if (!user) {
-      return res.status(401).json({ error: "Unauthorized" });
+      return res.status(401).json({ error: "Unauthorized...." });
     }
 
     req.user = user;
     next();
   } catch (e) {
     console.log("JWT verification failed:", e);
-    return res.status(401).json({ error: "Unauthorized" });
+    return res.status(401).json({ error: "Unauthorized.." });
   }
 };
 

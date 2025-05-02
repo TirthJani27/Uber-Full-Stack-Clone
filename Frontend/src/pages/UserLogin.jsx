@@ -23,12 +23,10 @@ const UserLogin = () => {
 
       if (response.status === 200) {
         const userData = response.data;
-        setUserData(userData.user);
+        setUserData({ ...userData.user, token: userData.token });
 
-        // Store the token without quotes
         localStorage.setItem("token", userData.token);
 
-        // Clear form
         setEmail("");
         setPassword("");
 

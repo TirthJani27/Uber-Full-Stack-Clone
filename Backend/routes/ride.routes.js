@@ -2,7 +2,7 @@ const express = require("express");
 const router = express();
 const userAuth = require("../middlewares/auth.middleware");
 const rideController = require("../controllers/ride.controller");
-const { body } = require("express-validator");
+const { body, query } = require("express-validator");
 
 router.post(
   "/create",
@@ -23,6 +23,17 @@ router.post(
   ],
   userAuth.authUser,
   rideController.createRide
+);
+
+router.get(
+  "/get-fair",
+  query("pickup").isString().isLength({ min: 3 }).withMessage("Invalid Pickup"),
+  query("destination")
+    .isString()
+    .isLength({ min: 3 })
+    .withMessage("Invalid Destination"),
+  userAuth.authUser,
+  rideController.getFair
 );
 
 module.exports = router;

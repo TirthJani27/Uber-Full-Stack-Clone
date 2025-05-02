@@ -1,19 +1,58 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import CaptainDetails from "../components/CaptainDetails";
 import RidePopup from "../components/RidePopup";
 import ConfirmRidePopup from "../components/ConfirmRidePopup";
 import { useGSAP } from "@gsap/react";
+import { SocketContext } from "../context/SocketContext";
+import { CaptainDataContext } from "../context/CaptainContext";
 
 import gsap from "gsap";
 
 const CaptainHome = () => {
-  const [ridePopupPannel, setRidePopupPannel] = useState(true);
+  const { captain } = useContext(CaptainDataContext);
+  const { sendMessage, onMessage } = useContext(SocketContext);
+
+  const [ridePopupPannel, setRidePopupPannel] = useState(false);
   const [confirmRidePopupPannel, setConfirmRidePopupPannel] = useState(false);
+  const [ride, setRide] = useState(null);
 
   const ridePopupPannelRef = useRef(null);
   const confirmRidePopupPannelRef = useRef(null);
 
+  useEffect(() => {
+    sendMessage("join", { userType: "captain", userId: captain._id });
+  }, []);
+
+  const startLocationUpdates = (captainId) => {
+    setInterval(() => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+
+          sendMessage("update-location-captain", {
+            userId: captainId,
+            userType: "captain",
+            location: {
+              ltd: latitude,
+              lng: longitude,
+            },
+          });
+        },
+        (err) => {
+          console.error("Location error:", err);
+        }
+      );
+    }, 10000);
+  };
+
+  startLocationUpdates(captain._id);
+
+  onMessage("new-ride", (data) => {
+    console.log(data);
+    setRide(data);
+    setRidePopupPannel(true);
+  });
   useGSAP(
     function () {
       if (ridePopupPannel) {
@@ -73,6 +112,7 @@ const CaptainHome = () => {
         className="fixed z-10 bg-white w-full bottom-0 translate-y-full px-3 py-10  pt-12"
       >
         <RidePopup
+          ride={ride}
           setConfirmRidePopupPannel={setConfirmRidePopupPannel}
           setRidePopupPannel={setRidePopupPannel}
         />

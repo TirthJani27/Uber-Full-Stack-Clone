@@ -19,6 +19,27 @@ async function calculateFair(pickup, destination, vehicleType) {
   const fair = (parseInt(distanceTime.res.distance.value) / 1000) * ratePerKm;
   return fair;
 }
+
+async function calculateFairAllVehicle(pickup, destination) {
+  const distanceTime = await mapService.getDistace(pickup, destination);
+
+  const baseRates = {
+    auto: 10,
+    moto: 8,
+    car: 15,
+  };
+
+  const fares = {};
+  for (const vehicleType in baseRates) {
+    const ratePerKm = baseRates[vehicleType];
+    fares[vehicleType] = parseInt(
+      (parseInt(distanceTime.res.distance.value) / 1000) * ratePerKm
+    ).toFixed(2);
+  }
+
+  return fares;
+}
+
 async function getOtp(num) {
   const otp = Math.floor(Math.random() * Math.pow(10, num))
     .toString()
@@ -47,3 +68,5 @@ module.exports.createRide = async ({
   });
   return ride;
 };
+
+module.exports.getFair = calculateFairAllVehicle;

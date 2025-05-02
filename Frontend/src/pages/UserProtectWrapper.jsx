@@ -8,7 +8,6 @@ const UserProtectWrapper = ({ children }) => {
   const { setUserData } = useContext(UserDataContext);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Get token and remove any extra quotes
   const token = localStorage.getItem("token")?.replace(/^"(.*)"$/, "$1");
 
   useEffect(() => {
@@ -29,7 +28,7 @@ const UserProtectWrapper = ({ children }) => {
         );
 
         if (res.status === 200) {
-          setUserData(res.data.user);
+          setUserData(res.data);
           setIsLoading(false);
         }
       } catch (err) {

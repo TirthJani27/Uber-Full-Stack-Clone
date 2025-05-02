@@ -19,7 +19,7 @@ const App = () => {
   return (
     <div className="">
       <Routes>
-        <Route path="/start" element={<Start />} />
+        <Route path="/" element={<Start />} />
         <Route path="/login" element={<UserLogin />} />
         <Route path="/captain-login" element={<CaptinLogin />} />
         <Route path="/captain-signup" element={<CaptinSignup />} />
@@ -41,7 +41,14 @@ const App = () => {
             </UserProtectWrapper>
           }
         ></Route>
-        <Route path="/captain-home" element={<CaptainHome />} />
+        <Route
+          path="/captain-home"
+          element={
+            <CaptainProtectWrapper>
+              <CaptainHome />
+            </CaptainProtectWrapper>
+          }
+        />
         <Route path="/captain-riding" element={<CaptainRiding />} />
         <Route
           path="/captain-logout"
