@@ -1,476 +1,131 @@
-# 🚀 User API Documentation
+# 🚗 Uber Backend API
 
-## Base Route: `/users`
-
----
-
-### 🔹 POST `/register`
-
-**Description**: Register a new user.
-
-**Request Body**:
-
-```json
-{
-  "fullname": {
-    "firstname": "string (min: 3 characters, required)",
-    "lastname": "string (min: 3 characters, optional)"
-  },
-  "email": "string (valid email format, required)",
-  "password": "string (min: 6 characters, required)"
-}
-```
-
-**Responses**:
-
-- **201 Created**: User registered successfully.
-
-```json
-{
-  "token": "string",
-  "user": {
-    "_id": "string",
-    "fullname": {
-      "firstname": "string",
-      "lastname": "string"
-    },
-    "email": "string"
-  }
-}
-```
-
-- **400 Bad Request**: Validation errors or user already exists.
-
-```json
-{
-  "errors": [
-    {
-      "msg": "Validation message",
-      "param": "field name",
-      "location": "body"
-    }
-  ]
-}
-// or
-{
-  "error": "User already exists"
-}
-```
+This is the backend for an Uber-like ride-hailing application, built with Node.js, Express, MongoDB, and Socket.IO.
 
 ---
 
-### 🔹 POST `/login`
+## 🚀 Features
 
-**Description**: Authenticate an existing user.
-
-**Request Body**:
-
-```json
-{
-  "email": "string (valid email format, required)",
-  "password": "string (min: 6 characters, required)"
-}
-```
-
-**Responses**:
-
-- **200 OK**: Successful login.
-
-```json
-{
-  "token": "string",
-  "user": {
-    "_id": "string",
-    "fullname": {
-      "firstname": "string",
-      "lastname": "string"
-    },
-    "email": "string"
-  }
-}
-```
-
-- **400 Bad Request**: Validation errors.
-
-```json
-{
-  "errors": [
-    {
-      "msg": "Validation message",
-      "param": "field name",
-      "location": "body"
-    }
-  ]
-}
-```
-
-- **401 Unauthorized**: Invalid credentials.
-
-```json
-{
-  "error": "Invalid email or password"
-}
-```
+- User and Captain (driver) registration & authentication
+- Ride creation, confirmation, and completion
+- Real-time ride updates via Socket.IO
+- Google Maps integration for geocoding and suggestions
+- Secure JWT-based authentication
+- Modular MVC structure
 
 ---
 
-### 🔹 GET `/profile`
+## 🛠️ Getting Started
 
-**Description**: Get the authenticated user's profile.
+### 1. Clone the repository
 
-**Headers**:
-
-- `Authorization`: `Bearer <token>` (required)
-
-**Responses**:
-
-- **200 OK**:
-
-```json
-{
-  "_id": "string",
-  "fullname": {
-    "firstname": "string",
-    "lastname": "string"
-  },
-  "email": "string"
-}
+```bash
+git clone <your-repo-url>
+cd Uber/Backend
 ```
 
-- **401 Unauthorized**:
+### 2. Install dependencies
 
-```json
-{
-  "message": "Unauthorized"
-}
+```bash
+npm install
 ```
+
+### 3. Configure environment variables
+
+Create a `.env` file in the `Backend` directory with the following:
+
+```
+PORT=8000
+DB_CONNECT=mongodb://localhost:27017/uber
+JWT_SECRET=your_jwt_secret
+GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+```
+
+### 4. Start the server
+
+```bash
+node server.js
+```
+
+The backend will run on `http://localhost:8000`.
 
 ---
 
-### 🔹 GET `/logout`
+## 📚 API Documentation
 
-**Description**: Log out the authenticated user.
+### User Endpoints
 
-**Headers**:
+- **POST `/users/register`**  
+  Register a new user by providing name, email, and password.
 
-- `Authorization`: `Bearer <token>` (required)
+- **POST `/users/login`**  
+  Authenticate a user and return a JWT token.
 
-**Responses**:
+- **GET `/users/profile`**  
+  Retrieve the authenticated user's profile details.
 
-- **200 OK**:
+- **GET `/users/logout`**  
+  Logout the user by invalidating the JWT token.
 
-```json
-{
-  "message": "Logged out"
-}
-```
+### Captain Endpoints
 
-- **401 Unauthorized**:
+- **POST `/captains/register`**  
+  Register a new captain with name, email, and vehicle details.
 
-```json
-{
-  "message": "Unauthorized"
-}
-```
+- **POST `/captains/login`**  
+  Authenticate a captain and return a JWT token.
 
----
+- **GET `/captains/profile`**  
+  Retrieve the authenticated captain's profile details.
 
-# 🧭 Captain API Documentation
+- **GET `/captains/logout`**  
+  Logout the captain by invalidating the JWT token.
 
-## Base Route: `/captains`
+### Ride Endpoints
 
----
+- **POST `/rides/create`**  
+  Create a new ride request (user only).
 
-### 🔹 POST `/register`
+- **GET `/rides/get-fair`**  
+  Get an estimated fare for a ride based on distance and time.
 
-**Description**: Register a new captain.
+- **POST `/rides/confirm`**  
+  Confirm a ride request as a captain.
 
-**Request Body**:
+- **GET `/rides/start-ride`**  
+  Start a ride after verifying the OTP (captain only).
 
-```json
-{
-  "fullname": {
-    "firstname": "string (min: 3 characters, required)",
-    "lastname": "string (min: 3 characters, optional)"
-  },
-  "email": "string (valid email format, required)",
-  "password": "string (min: 6 characters, required)",
-  "vehicle": {
-    "color": "string (min: 3 characters, required)",
-    "plate": "string (min: 3 characters, required)",
-    "capacity": "number (required)",
-    "vehicleType": "string (enum: ['car', 'motorcycle', 'auto'], required)"
-  }
-}
-```
+- **POST `/rides/end-ride`**  
+  Mark the ride as completed (captain only).
 
-**Responses**:
+### Maps Endpoints
 
-- **200 OK**: Captain registered successfully.
+- **GET `/maps/get-coordinates`**  
+  Retrieve latitude and longitude for a given address.
 
-```json
-{
-  "token": "string",
-  "captain": {
-    "_id": "string",
-    "fullname": {
-      "firstname": "string",
-      "lastname": "string"
-    },
-    "email": "string",
-    "vehicle": {
-      "color": "string",
-      "plate": "string",
-      "capacity": "number",
-      "type": "string"
-    }
-  }
-}
-```
+- **GET `/maps/get-distance-time`**  
+  Calculate distance and estimated time between two locations.
 
-- **400 Bad Request**: Validation errors.
-
-```json
-{
-  "errors": [
-    {
-      "msg": "Validation message",
-      "param": "field name",
-      "location": "body"
-    }
-  ]
-}
-```
-
-- **401 Unauthorized**: Captain already exists.
-
-```json
-{
-  "message": "Captian already exists"
-}
-```
+- **GET `/maps/get-suggestion`**  
+  Fetch address suggestions based on partial input.
 
 ---
 
-### 🔹 POST `/login`
+## 🧑‍💻 Development Notes
 
-**Description**: Authenticate an existing captain.
-
-**Request Body**:
-
-```json
-{
-  "email": "string (valid email format, required)",
-  "password": "string (min: 6 characters, required)"
-}
-```
-
-**Responses**:
-
-- **200 OK**: Successful login.
-
-```json
-{
-  "token": "string",
-  "captain": {
-    "_id": "string",
-    "fullname": {
-      "firstname": "string",
-      "lastname": "string"
-    },
-    "email": "string",
-    "vehicle": {
-      "color": "string",
-      "plate": "string",
-      "capacity": "number",
-      "type": "string"
-    }
-  }
-}
-```
-
-- **400 Bad Request**: Validation errors.
-
-```json
-{
-  "errors": [
-    {
-      "msg": "Validation message",
-      "param": "field name",
-      "location": "body"
-    }
-  ]
-}
-```
-
-- **401 Unauthorized**: Invalid credentials.
-
-```json
-{
-  "message": "Invaild email or password"
-}
-```
+- All endpoints requiring authentication expect a JWT in the `Authorization: Bearer <token>` header.
+- Socket.IO is used for real-time ride status updates.
+- See the code for detailed request/response formats and error handling.
 
 ---
 
-### 🔹 GET `/profile`
+## 📄 License
 
-**Description**: Get the authenticated captain's profile.
-
-**Headers**:
-
-- `Authorization`: `Bearer <token>` (required)
-
-**Responses**:
-
-- **200 OK**:
-
-```json
-{
-  "captain": {
-    "_id": "string",
-    "fullname": {
-      "firstname": "string",
-      "lastname": "string"
-    },
-    "email": "string",
-    "vehicle": {
-      "color": "string",
-      "plate": "string",
-      "capacity": "number",
-      "type": "string"
-    }
-  }
-}
-```
-
-- **401 Unauthorized**:
-
-```json
-{
-  "message": "Unauthorized"
-}
-```
+MIT
 
 ---
 
-### 🔹 GET `/logout`
+## 📬 Contact
 
-**Description**: Log out the authenticated captain.
+For questions or support, open an issue or contact the maintainer.
 
-**Headers**:
-
-- `Authorization`: `Bearer <token>` (required)
-
-**Responses**:
-
-- **200 OK**:
-
-```json
-{
-  "message": "Logged out successfully"
-}
-```
-
-- **401 Unauthorized**:
-
-```json
-{
-  "message": "Unauthorized"
-}
-```
-
----
-
-# 🚗 Ride API Documentation
-
-## Base Route: `/rides`
-
----
-
-### 🔹 POST `/create`
-
-**Description**: Create a new ride (user only).
-
-**Headers**:
-
-- `Authorization`: `Bearer <token>` (required)
-
-**Request Body**:
-
-```json
-{
-  "pickup": "string (min: 3 characters, required)",
-  "destination": "string (min: 3 characters, required)",
-  "vehicleType": "string (enum: ['car', 'auto', 'moto'], required)"
-}
-```
-
-**Responses**:
-
-- **200 OK**: Ride created successfully.
-
-```json
-{
-  "_id": "string",
-  "user": "string",
-  "pickup": "string",
-  "destination": "string",
-  "fare": "number",
-  "otp": "number",
-  "status": "pending"
-  // ...other ride fields
-}
-```
-
-- **401 Unauthorized**: Validation errors.
-
-```json
-{
-  "errors": [
-    {
-      "msg": "Validation message",
-      "param": "field name",
-      "location": "body"
-    }
-  ]
-}
-```
-
-- **400 Bad Request**: Other errors.
-
-```json
-{
-  "message": "Error message"
-}
-```
-
----
-
-# 🗺️ Maps API Documentation
-
-## Base Route: `/maps`
-
-All endpoints require user authentication (`Authorization: Bearer <token>`).
-
-### 🔹 GET `/get-coordinates?address=...`
-
-- **Description**: Get latitude and longitude for an address.
-
-### 🔹 GET `/get-distance-time?origin=...&destination=...`
-
-- **Description**: Get distance and time between two addresses.
-
-### 🔹 GET `/get-suggestion?input=...`
-
-- **Description**: Get address suggestions for autocomplete.
-
----
-
-## ✅ Notes
-
-- Set the header `Content-Type: application/json` for all requests with a body.
-- Tokens returned on login/register should be used as Bearer tokens for all authenticated routes.
-- Validation errors are returned as an `errors` array; other errors may use `error` or `message`.
-- For enhanced security, use HTTPS and store tokens securely (e.g., in HTTP-only cookies or secure local storage).
-- Some endpoints may return 200 or 201 for successful creation; check the actual implementation for details.
