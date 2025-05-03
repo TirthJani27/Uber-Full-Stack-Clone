@@ -1,10 +1,28 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Input } from "@material-tailwind/react";
+import axios from "axios";
 const ConfirmRidePopup = (props) => {
   const [otp, setOtp] = useState("");
-  const submitHandler = (e) => {
+  const navigate = useNavigate();
+
+  const submitHandler = async (e) => {
     e.preventDefault();
+    console.log(props.ride);
+    const res = await axios.get(
+      `${import.meta.env.VITE_BASE_URL}rides/start-ride`,
+      {
+        params: { rideId: props.ride._id, otp: otp },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("captain-token")}`,
+        },
+      }
+    );
+    if (res.status == 200) {
+      props.setConfirmRidePopupPannel(false);
+      props.setRidePopupPannel(false);
+      navigate("/captain-riding", { state: { ride: props.ride } });
+    }
   };
   return (
     <div>
@@ -19,7 +37,10 @@ const ConfirmRidePopup = (props) => {
             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMdBuvbsYu7WYAAUY2AqSQRGNESsYdkucDkQ&s"
             alt=""
           />
-          <h2 className="text-xl font-medium ">Harshita Rajput</h2>
+          <h2 className="text-xl font-medium ">
+            {props.ride?.user?.fullname.firstname}{" "}
+            {props.ride?.user.fullname.lastname ?? " "}
+          </h2>
         </div>
         <h5 className="text-lg font-semibold">2.2 km</h5>
       </div>
@@ -29,25 +50,25 @@ const ConfirmRidePopup = (props) => {
           <div className="flex items-center gap-5 p-2 border-b-2 ">
             <i className="ri-map-pin-user-fill"></i>
             <div className="">
-              <h3 className="text-lg font-medium">562/11-A</h3>
+              <h3 className="text-lg font-medium">Pickup</h3>
               <p className="text-sm -mt-1 text-gray-600">
-                Kankariya Talab, Ahmedabad{" "}
+                {props.ride?.pickup}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-5 p-2 border-b-2 ">
             <i className=" text-lg ri-map-pin-2-fill"></i>
             <div className="">
-              <h3 className="text-lg font-medium">562/11-A</h3>
+              <h3 className="text-lg font-medium">Destination</h3>
               <p className="text-sm -mt-1 text-gray-600">
-                Kankariya Talab, Ahmedabad{" "}
+                {props.ride?.destination}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-5 p-2 ">
             <i className=" text-lg ri-currency-line"></i>
             <div className="">
-              <h3 className="text-lg font-medium">₹193.20</h3>
+              <h3 className="text-lg font-medium">₹{props.ride?.fare}</h3>
               <p className="text-sm -mt-1 text-gray-600">Cash Cash</p>
             </div>
           </div>
@@ -64,8 +85,8 @@ const ConfirmRidePopup = (props) => {
               label="Enter OTP"
               size={6}
             />
-            <button className="text-center w-full mt-5 bg-green-600 text-white font-semibold p-2 rounded-lg">
-              <Link to={"/captain-riding"}>Confirm</Link>
+            <button className="w-full mt-4 bg-green-600 text-white font-semibold p-3 rounded-lg">
+              Confirm
             </button>
           </form>
           <button
@@ -73,7 +94,7 @@ const ConfirmRidePopup = (props) => {
               props.setConfirmRidePopupPannel(false);
               props.setRidePopupPannel(false);
             }}
-            className="w-full mt-1 bg-red-500 text-white font-semibold p-2 rounded-lg "
+            className="w-full mt-1 bg-red-500 text-white font-semibold p-3 rounded-lg"
           >
             Cancel
           </button>

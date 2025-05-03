@@ -19,7 +19,11 @@ const LookingForDriver = (props) => {
       </h5>
       <h3 className="text-2xl font-semibold mb-5">Looking for a driver</h3>
       <div className="flex justify-between items-center flex-col gap-2">
-        <img className="h-20" src={vehicleImages[props.vehicleType]} alt="" />
+        <img
+          className="h-20"
+          src={vehicleImages[props.vehicleType ?? " "]}
+          alt=""
+        />
         <div className="w-full mt-5">
           <div className="flex items-center gap-5 p-2 border-b-2 ">
             <i className="ri-map-pin-user-fill"></i>
@@ -39,7 +43,9 @@ const LookingForDriver = (props) => {
             <i className=" text-lg ri-currency-line"></i>
             <div className="">
               <h3 className="text-lg font-medium">
-                ₹{props.fair[props.vehicleType]}
+                ₹
+                {props?.fair[props.vehicleType] ??
+                  "https://swyft.pl/wp-content/uploads/2023/05/how-many-people-can-a-uberx-take.jpg"}
               </h3>
               <p className="text-sm -mt-1 text-gray-600">Cash Cash</p>
             </div>
@@ -50,4 +56,33 @@ const LookingForDriver = (props) => {
   );
 };
 
-export default LookingForDriver;
+const VehicleFoundComponent = ({
+  vehicleFound,
+  refs,
+  fair,
+  vehicleType,
+  pickup,
+  destination,
+  setVehicleFound,
+}) => {
+  return (
+    <>
+      {vehicleFound && (
+        <div
+          ref={refs.vehicleFound}
+          className="fixed z-10 bg-white w-full bottom-0 px-3 py-6 translate-y-full pt-12"
+        >
+          <LookingForDriver
+            fair={fair}
+            vehicleType={vehicleType}
+            pickup={pickup}
+            destination={destination}
+            setVehicleFound={setVehicleFound}
+          />
+        </div>
+      )}
+    </>
+  );
+};
+
+export default VehicleFoundComponent;

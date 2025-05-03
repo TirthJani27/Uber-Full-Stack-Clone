@@ -21,8 +21,8 @@ const RidePopup = (props) => {
             alt=""
           />
           <h2 className="text-xl font-medium ">
-            {props.ride.user.fullname.firstname}{" "}
-            {props.ride.user.fullname.lastname ?? " "}
+            {props.ride?.user?.fullname.firstname}{" "}
+            {props.ride?.user.fullname.lastname ?? " "}
           </h2>
         </div>
         <h5 className="text-lg font-semibold">2.2 km</h5>
@@ -34,7 +34,9 @@ const RidePopup = (props) => {
             <i className="ri-map-pin-user-fill"></i>
             <div className="">
               <h3 className="text-lg font-medium">Pickup</h3>
-              <p className="text-sm -mt-1 text-gray-600">{props.ride.pickup}</p>
+              <p className="text-sm -mt-1 text-gray-600">
+                {props.ride?.pickup}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-5 p-2 border-b-2 ">
@@ -42,20 +44,21 @@ const RidePopup = (props) => {
             <div className="">
               <h3 className="text-lg font-medium">Destination</h3>
               <p className="text-sm -mt-1 text-gray-600">
-                {props.ride.destination}
+                {props.ride?.destination}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-5 p-2 ">
             <i className=" text-lg ri-currency-line"></i>
             <div className="">
-              <h3 className="text-lg font-medium">₹{props.ride.fare}</h3>
+              <h3 className="text-lg font-medium">₹{props.ride?.fare}</h3>
               <p className="text-sm -mt-1 text-gray-600">Cash Cash</p>
             </div>
           </div>
         </div>
         <button
-          onClick={() => {
+          onClick={async () => {
+            await props.confirmRide();
             props.setConfirmRidePopupPannel(true);
           }}
           className="w-full mt-5 bg-green-600 text-white font-semibold p-2 rounded-lg "

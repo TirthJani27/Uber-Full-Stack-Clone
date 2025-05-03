@@ -16,11 +16,12 @@ import LookingForDriver from "../components/LookingForDriver";
 import WaitingForDriver from "../components/WaitingForDriver";
 import { SocketContext } from "../context/SocketContext";
 import { UserDataContext } from "../context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 import "remixicon/fonts/remixicon.css";
 
 const Home = () => {
-  const { sendMessage } = useContext(SocketContext);
+  const { sendMessage, onMessage } = useContext(SocketContext);
   const { userData } = useContext(UserDataContext);
 
   useEffect(() => {
@@ -30,6 +31,7 @@ const Home = () => {
     });
   }, []);
 
+  const navigate = useNavigate();
   const [pickup, setPickup] = useState("");
   const [destination, setDestination] = useState("");
   const [pannelOpen, setPannelOpen] = useState(false);
@@ -41,6 +43,7 @@ const Home = () => {
   const [activeField, setActiveField] = useState("");
   const [debouncedInput, setDebouncedInput] = useState("");
   const [vehicleType, setVehicleType] = useState("");
+  const [ride, setRide] = useState(null);
   const [fair, setFair] = useState({
     auto: 0,
     moto: 0,
@@ -79,7 +82,6 @@ const Home = () => {
           },
         }
       );
-      console.log(res);
       setSuggestions(res.data || []);
     } catch (err) {
       console.error(err);
@@ -103,7 +105,6 @@ const Home = () => {
         }
       );
       setFair(res.data);
-      console.log(res.data);
     } catch (err) {
       console.error(err);
     }
@@ -116,19 +117,13 @@ const Home = () => {
         destination,
         vehicleType,
       };
-      console.log({ ...data });
 
-      const res = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}rides/create`,
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      console.log(res.data);
+      await axios.post(`${import.meta.env.VITE_BASE_URL}rides/create`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setVehicleFound(true);
     } catch (err) {
       console.error(err);
     }
@@ -184,24 +179,38 @@ const Home = () => {
 
   useGSAP(() => {
     animatePanel(refs.confirmRidePannel, confirmRidePannel, {
-      enter: { transform: "translateY(0%)" },
-      exit: { transform: "translateY(100%)" },
+      enter: { transform: "translateY(0%)", display: "block" },
+      exit: { transform: "translateY(100%)", display: "none" },
     });
   }, [confirmRidePannel]);
 
   useGSAP(() => {
     animatePanel(refs.vehicleFound, vehicleFound, {
-      enter: { transform: "translateY(0%)" },
-      exit: { transform: "translateY(100%)" },
+      enter: { transform: "translateY(0%)", display: "block" },
+      exit: { transform: "translateY(100%)", display: "none" },
     });
   }, [vehicleFound]);
 
   useGSAP(() => {
     animatePanel(refs.waitingForDriver, waitingForDriver, {
-      enter: { transform: "translateY(0%)" },
-      exit: { transform: "translateY(100%)" },
+      enter: { transform: "translateY(0%)", display: "block" },
+      exit: { transform: "translateY(100%)", display: "none" },
     });
   }, [waitingForDriver]);
+
+  onMessage("ride-confirmed", (ride) => {
+    setRide(ride);
+    setWaitingForDriver(true);
+    setVehicleFound(false);
+    setConfirmRidePannel(false);
+    setVehiclePannelOpen(false);
+  });
+  onMessage("ride-started", (ride) => {
+    setRide(ride);
+    console.log("This is from the home and this is ride: ", ride);
+    setWaitingForDriver(false);
+    navigate("/riding", { state: { ride } }); // Pass ride data here
+  });
 
   return (
     <div className="h-screen relative overflow-hidden">
@@ -281,7 +290,7 @@ const Home = () => {
       </div>
 
       <div
-        className="fixed z-10 bg-white w-full bottom-0 px-3 py-6 translate-y-full pt-12"
+        className="fixed z-20 bg-white w-full bottom-0 px-3 py-6 pt-12 translate-y-full transition-transform duration-300"
         ref={refs.confirmRidePannel}
       >
         <ConfirmRide
@@ -310,9 +319,12 @@ const Home = () => {
 
       <div
         ref={refs.waitingForDriver}
-        className="fixed z-10 bg-white w-full bottom-0 px-3 py-6 pt-12 translate-y-full"
+        className="fixed z-50 bg-white w-full bottom-0 px-3 py-6 pt-12 translate-y-full"
       >
-        <WaitingForDriver setWaitingForDriver={setWaitingForDriver} />
+        <WaitingForDriver
+          ride={ride}
+          setWaitingForDriver={setWaitingForDriver}
+        />
       </div>
     </div>
   );

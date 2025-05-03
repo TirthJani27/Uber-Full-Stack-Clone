@@ -1,7 +1,20 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useContext } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { SocketContext } from "../context/SocketContext";
 
 const Riding = () => {
+  const { onMessage } = useContext(SocketContext);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const ride = location.state?.ride;
+  console.log(ride);
+
+  
+  onMessage("ride-ended", (ride) => {
+    console.log("Ride ended ", ride);
+    navigate("/home");
+  });
+
   return (
     <div className="h-screen">
       <Link
@@ -25,7 +38,9 @@ const Riding = () => {
             alt=""
           />
           <div className="text-right">
-            <h2 className="text-lg font-medium">Sarthak</h2>
+            <h2 className="text-lg font-medium">
+              {ride.user.fullname.firstname} {ride.user.fullname.lastname}
+            </h2>
             <h4 className="text-xl font-semibold -mt-1 -mb-1">MP04 AB 1234</h4>
             <p className="text-sm text-gray-600">Maruti Suzuki Alto</p>
           </div>

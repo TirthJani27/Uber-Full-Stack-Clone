@@ -8,6 +8,7 @@ import { SocketContext } from "../context/SocketContext";
 import { CaptainDataContext } from "../context/CaptainContext";
 
 import gsap from "gsap";
+import axios from "axios";
 
 const CaptainHome = () => {
   const { captain } = useContext(CaptainDataContext);
@@ -47,6 +48,29 @@ const CaptainHome = () => {
   };
 
   startLocationUpdates(captain._id);
+
+  const confirmRide = async () => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}rides/confirm`,
+        {
+          rideId: ride._id,
+          captain: captain._id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("captain-token")}`,
+          },
+        }
+      );
+      console.log("Ride confirmed:", response.data);
+    } catch (error) {
+      console.error(
+        "Error confirming ride:",
+        error.response?.data || error.message
+      );
+    }
+  };
 
   onMessage("new-ride", (data) => {
     console.log(data);
@@ -115,6 +139,7 @@ const CaptainHome = () => {
           ride={ride}
           setConfirmRidePopupPannel={setConfirmRidePopupPannel}
           setRidePopupPannel={setRidePopupPannel}
+          confirmRide={confirmRide}
         />
       </div>
       <div
@@ -122,6 +147,7 @@ const CaptainHome = () => {
         className="fixed h-screen z-10 bg-white w-full bottom-0 translate-y-full px-3 py-10  pt-12"
       >
         <ConfirmRidePopup
+          ride={ride}
           setRidePopupPannel={setRidePopupPannel}
           setConfirmRidePopupPannel={setConfirmRidePopupPannel}
         />
